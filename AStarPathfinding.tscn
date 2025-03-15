@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://bdebhlf8r1t2o"]
+
+[ext_resource type="Script" uid="uid://cym43mdtkn4ii" path="res://AStarPathfinding.gd" id="1_2vnui"]
+
+[node name="AStarPathfinding" type="Node2D"]
+script = ExtResource("1_2vnui")
+
+[node name="Line2D" type="Line2D" parent="."]
+default_color = Color(0, 1, 0, 1)

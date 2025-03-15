@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SaveUserPreferences" load_steps=2 format=3 uid="uid://bvdnw0yvb7ltk"]
+
+[ext_resource type="Script" uid="uid://dr3y3mvcg2udq" path="res://Common/Saveables/SaveUserPreferences.gd" id="1_7jkqe"]
+
+[resource]
+script = ExtResource("1_7jkqe")
+master_audio_level = 0.0
+music_audio_level = 0.0
+sfx_audio_level = 0.0
+fullscreen_checked = false
+borderless_checked = false
+vsync_checked = false

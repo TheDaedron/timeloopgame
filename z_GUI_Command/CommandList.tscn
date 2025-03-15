@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://8hkrnfcbe5bv"]
+
+[ext_resource type="Script" uid="uid://vr1s740538gn" path="res://z_GUI_Command/CommandList.gd" id="1_dw2xj"]
+
+[node name="CommandList" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+size_flags_vertical = 3
+script = ExtResource("1_dw2xj")
+
+[node name="ButtonContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+offset_left = 394.0
+offset_right = 434.0
+offset_bottom = 31.0
+
+[node name="AddCommand" type="Button" parent="ButtonContainer"]
+layout_mode = 2
+text = "+"
+
+[node name="AddFolder" type="Button" parent="ButtonContainer"]
+layout_mode = 2
+text = "◊"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_right = 100.0
+offset_bottom = 200.0
+horizontal_scroll_mode = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+
+[node name="CommandContainer" type="VBoxContainer" parent="ScrollContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="ScrollContainer/HBoxContainer"]
+layout_mode = 2

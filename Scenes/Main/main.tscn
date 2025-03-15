@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3 uid="uid://pemj04dkxrc"]
+
+[ext_resource type="PackedScene" uid="uid://bjwl4ony6ha25" path="res://Tilemap/Tilemap.tscn" id="1_khby1"]
+[ext_resource type="Script" uid="uid://cb3j7qs4awkhr" path="res://Path.gd" id="3_f3t31"]
+[ext_resource type="PackedScene" uid="uid://jyf780tpg4cd" path="res://Command_Tree/command_tree.tscn" id="4_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://c5npq1v0hctjx" path="res://Command_GUI/command_gui.tscn" id="5_p6jpk"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Path" type="Node2D" parent="."]
+script = ExtResource("3_f3t31")
+
+[node name="Tilemap" parent="." instance=ExtResource("1_khby1")]
+position = Vector2(-570, -175)
+scale = Vector2(1.8, 1.8)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Game_GUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Command_Tree" parent="Game_GUI" instance=ExtResource("4_1bvp3")]
+layout_mode = 0
+offset_left = 300.0
+offset_top = -250.0
+offset_right = 450.0
+offset_bottom = 250.0
+
+[node name="Command_GUI" parent="Game_GUI" instance=ExtResource("5_p6jpk")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 305.0
+offset_top = 266.0
+offset_right = 305.0
+offset_bottom = 266.0
+grow_horizontal = 2
+grow_vertical = 2

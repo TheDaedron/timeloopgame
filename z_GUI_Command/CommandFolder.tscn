@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3 uid="uid://ed31mo7s2kyo"]
+
+[ext_resource type="Script" uid="uid://dbe08nv53x6x5" path="res://z_GUI_Command/CommandFolder.gd" id="1_t2e0i"]
+[ext_resource type="Script" uid="uid://dj0s1wqtr5vc4" path="res://z_GUI_Command/VboxDebug.gd" id="2_6emxq"]
+
+[node name="CommandFolder" type="Control"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("1_t2e0i")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_6emxq")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="FolderLabel" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="CollapseButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "▼"
+
+[node name="DeleteButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "X"
+
+[node name="FolderContents" type="VBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10

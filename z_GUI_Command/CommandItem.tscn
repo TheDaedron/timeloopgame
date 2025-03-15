@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://caolaei1tynqh"]
+
+[ext_resource type="Script" uid="uid://dvxwu0f2a1u3e" path="res://z_GUI_Command/CommandItem.gd" id="1_ecqdc"]
+
+[node name="CommandItem" type="Control"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("1_ecqdc")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 30.0
+alignment = 1
+
+[node name="CommandLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "CommandText"
