@@ -1,0 +1,83 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5npq1v0hctjx"]
+
+[ext_resource type="Script" uid="uid://cvpuyr7hqjmf1" path="res://Commands_GUI/command_gui.gd" id="1_c4hto"]
+
+[node name="Command_GUI" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_c4hto")
+
+[node name="Action_Grid" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_right = 150.0
+offset_bottom = 101.0
+theme_override_constants/separation = -1
+
+[node name="Action_Interact" type="Button" parent="Action_Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Interact"
+
+[node name="Action_Speak" type="Button" parent="Action_Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Speak"
+
+[node name="Action_Attack" type="Button" parent="Action_Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Attack"
+
+[node name="Move_Grid" type="GridContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/h_separation = -1
+theme_override_constants/v_separation = -1
+columns = 3
+
+[node name="Empty_TL" type="Control" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+
+[node name="Move_Up" type="Button" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "^"
+
+[node name="Empty_TR" type="Control" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+
+[node name="Move_Left" type="Button" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "<"
+
+[node name="Empty_Mid" type="Control" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+
+[node name="Move_Right" type="Button" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = ">
+"
+
+[node name="Empty_BL" type="Control" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+
+[node name="Move_Down" type="Button" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "v"
+
+[node name="Empty_BR" type="Control" parent="Move_Grid"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://jyf780tpg4cd"]
 
-[ext_resource type="Script" uid="uid://ct03muhpjmwkv" path="res://Command_Tree/command_tree.gd" id="1_1i8o7"]
+[ext_resource type="Script" uid="uid://ct03muhpjmwkv" path="res://Commands_GUI/command_tree.gd" id="1_1i8o7"]
 
 [node name="Command_Tree" type="Tree"]
 offset_right = 200.0

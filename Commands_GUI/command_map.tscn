@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://cwviexd7nekgy"]
+
+[ext_resource type="Script" uid="uid://bgs4ubgrofbhv" path="res://Commands_GUI/command_map.gd" id="1_8lu8k"]
+[ext_resource type="PackedScene" uid="uid://qxlqqdsiisfh" path="res://Tilemap/tile_map_layer.tscn" id="2_r1fm6"]
+
+[node name="Command_Map" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8lu8k")
+
+[node name="Map_Up" type="Button" parent="."]
+layout_mode = 0
+offset_left = 376.0
+offset_top = 33.0
+offset_right = 393.0
+offset_bottom = 64.0
+text = "^"
+
+[node name="Map_Down" type="Button" parent="."]
+layout_mode = 0
+offset_left = 376.0
+offset_top = 512.0
+offset_right = 393.0
+offset_bottom = 543.0
+text = "v"
+
+[node name="Map_Left" type="Button" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 273.0
+offset_right = 50.0
+offset_bottom = 304.0
+text = "<"
+
+[node name="Map_Right" type="Button" parent="."]
+layout_mode = 0
+offset_left = 715.0
+offset_top = 273.0
+offset_right = 733.0
+offset_bottom = 304.0
+text = ">"
+
+[node name="TileMapLayer" parent="." instance=ExtResource("2_r1fm6")]
+visible = false
+z_index = -1

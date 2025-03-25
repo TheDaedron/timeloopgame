@@ -15,7 +15,7 @@ var end : Vector2i
 func _ready():
 	initialize_grid()
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	end = Vector2i(get_local_mouse_position()) / cell_size
 	update_path()
 

@@ -7,33 +7,32 @@ var drop_position = Vector2.ZERO
 var drop_target: TreeItem = null
 var drop_type = ""  # Can be "above", "on", "below"
 
+var history = []  # Stores tree states for undo/redo
+
+# Set up the tree UI (theme and behavior)
 func _ready():
-	# Create a nine-slice background
+	# Create a nine-slice background from a sprite sheet
 	var tree_slice_bg = create_nine_slice_background(tree_sprite_sheet)
 
-	# Apply it to a custom theme
+	# Apply the custom theme to the Tree
 	var theme = Theme.new()
-	theme.set_stylebox("panel", "Tree", tree_slice_bg)  # Set as Tree's background
+	theme.set_stylebox("panel", "Tree", tree_slice_bg)  # Assigning as Tree background
 	
-	# Assign theme to the Tree
-	self.theme = theme
+	self.theme = theme  # Set the theme
 
-	# Configure Tree into the correct mode
-	self.set_hide_root(true)
-	self.set_select_mode(Tree.SELECT_MULTI)  # Allow multiple selection
+	# Configure tree properties
+	self.set_hide_root(true)  # Hide the root item
+	self.set_select_mode(Tree.SELECT_MULTI)  # Enable multiple selection
 	self.set_drop_mode_flags(Tree.DROP_MODE_ON_ITEM | Tree.DROP_MODE_INBETWEEN)
 	self.item_edited.connect(_on_item_edited)
 
-	# === B) Populate the tree ===
-	root_item = self.create_item()  # Invisible root (since hide_root is true)
+	# Create the root item (invisible since hide_root is true)
+	root_item = self.create_item()
+	root_item.set_meta("type", "root")
 
-	# Add folders
+	# Populate the tree with folders
 	for i in range(3):
-		_add_folder("Folder " + str(i+1))
-
-	# Add commands
-	#for i in range(10):
-	#	_add_command("Command " + str(i+1))
+		_add_folder("Folder " + str(i + 1))
 
 func _gui_input(event):
 	# Update visuals while dragging
@@ -75,6 +74,49 @@ func _on_item_edited():
 	if item and item.get_meta("type", "") == "folder":
 		print("[INFO] Folder renamed to:", item.get_text(0))
 
+# Expand/Collapse Animation
+func _toggle_expand(item: TreeItem):
+	var tween = get_tree().create_tween()
+	tween.tween_property(item, "modulate:a", 0.5, 0.15).set_trans(Tween.TRANS_CUBIC)
+	item.collapsed = !item.collapsed
+	tween.tween_property(item, "modulate:a", 1.0, 0.15)
+
+# Undo/Redo System
+func save_state():
+	history.append(get_tree_structure_as_dict())
+
+func undo():
+	if history.is_empty():
+		return
+	var last_state = history.pop_back()
+	restore_tree_from_dict(last_state)
+
+func get_tree_structure_as_dict():
+	var data = []
+	var child = root_item.get_first_child()
+	while child:
+		data.append({ "name": child.get_text(0), "type": child.get_meta("type"), "collapsed": child.collapsed })
+		child = child.get_next()
+		return data
+
+func restore_tree_from_dict(data):
+	root_item.clear_children()
+	for entry in data:
+		if entry["type"] == "folder":
+			var folder = _add_folder(entry["name"])
+			folder.collapsed = entry["collapsed"]
+		else:
+			_add_command(entry["name"])
+
+# Helper function to check if `potential_child` is a descendant of `parent_item`
+func _is_descendant(parent_item: TreeItem, potential_child: TreeItem) -> bool:
+	var current = potential_child
+	while current:
+		if current == parent_item:
+			return true  # A circular move detected
+		current = current.get_parent()
+	return false  # Safe move
+
 # === DRAG AND DROP FUNCTIONALITY ===
 func _get_selected_items() -> Array:
 	var selected_items = []
@@ -99,94 +141,93 @@ func _get_drag_data(position):
 func _can_drop_data(position, data):
 	if not (data is Dictionary) or "items" not in data:
 		return false
-	
+
 	var items_to_move = data["items"]
 	var target = get_item_at_position(position)
 
-	if not target or target == root_item:
-		drop_target = null
-		drop_type = ""
+	# === Allow dropping to the root when hovering over an empty space ===
+	if not target:
+		drop_target = root_item
+		drop_type = "on"
+		queue_redraw()
+		return true
+
+	if target == root_item:
 		return false
 
-	# Get the rectangle area of the target item
-	var item_rect = get_item_area_rect(target, 0)  # Column 0 (main text column)
+	# Get item rectangle area
+	var item_rect = get_item_area_rect(target, 0)
 	var mid_y = item_rect.position.y + (item_rect.size.y / 2)
 
-	# Determine drop type
-	if position.y < mid_y - 5:
-		drop_type = "above"
-	elif position.y > mid_y + 5:
-		drop_type = "below"
-	else:
-		drop_type = "on"
-
+	# Determine drop position type
+	drop_type = "above" if position.y < mid_y - 5 else "below" if position.y > mid_y + 5 else "on"
 	drop_target = target
 	drop_position = Vector2(item_rect.position.x, mid_y)
 
-	queue_redraw()  # Redraw to update the UI
+	# Redraw only if necessary
+	if drop_target != target:
+		queue_redraw()
 
+	# Prevent self-drop and circular parent-child relations
 	for item in items_to_move:
-		if item == target:
-			return false  # Prevent dropping on itself
+		if item == target or _is_descendant(item, target):
+			return false
 
-		# Allow reordering within same parent
-		if item.get_meta("type") == "command" and target.get_meta("type") == "command":
-			if item.get_parent() != target.get_parent():
-				return false
-			return true
+	# Drop rules based on item type
+	var item_type = items_to_move[0].get_meta("type", "")
+	var target_type = target.get_meta("type", "")
 
-		if item.get_meta("type") == "folder" and target.get_meta("type") == "folder":
-			if item.get_parent() != target.get_parent():
-				return false
-			return true
+	var valid_drops = {
+		"command": ["folder", "command"],  # Commands can be moved into folders or reordered within commands
+		"folder": ["folder"]  # Folders can only be reordered with folders
+	}
 
-		# Allow moving a command into a folder
-		if item.get_meta("type") == "command" and target.get_meta("type") == "folder":
-			return true
-
-	return false
+	return target_type in valid_drops.get(item_type, [])
 
 func _drop_data(position, data):
-	print("\n=== _drop_data() CALLED ===")
-
 	if not (data is Dictionary) or "items" not in data:
-		print("[ERROR] Invalid drag data!")
 		return
 
 	var items_to_move: Array = data["items"]
 	var target: TreeItem = get_item_at_position(position)
 
+	# === NEW: If dropped on an empty space, move to root ===
+	if not target:
+		target = root_item
+
 	if not target or target == root_item:
-		print("[ERROR] Invalid drop target!")
-		return
-	
+		print("[INFO] Moving item(s) to root")
+
 	if not _can_drop_data(position, data):
-		print("[ERROR] Drop not allowed!")
 		return
 
-	# Determine the new parent (either for reordering or moving into a folder)
+	# Determine new parent (root if dropping in empty space)
 	var new_parent = target.get_parent() if target.get_meta("type") == "command" else target
-	var target_index = target.get_index()  # Get index of the target item
+	if new_parent == root_item:
+		new_parent = root_item  # Ensure root is assigned correctly
 
-	# Reverse the array to maintain order when reinserting
+	var target_index = target.get_index()  # Target's position
+
+	# Reverse to maintain order
 	items_to_move.reverse()
 
 	for item_to_move in items_to_move:
 		if item_to_move == target:
-			continue  # Skip if trying to move onto itself
+			continue  # Skip if moving onto itself
 
 		var old_parent = item_to_move.get_parent()
 		var old_index = item_to_move.get_index()
 
-		# Ensure we are not causing a circular structure
+		# Prevent unnecessary moves
 		if old_parent == new_parent and old_index == target_index:
-			continue  # No need to move if already in place
+			continue
 
-		# Copy item properties before deleting it
+		# Copy properties before deleting old item
 		var new_item = new_parent.create_child()
 		new_item.set_text(0, item_to_move.get_text(0))
 		new_item.set_meta("type", item_to_move.get_meta("type"))
 		new_item.set_editable(0, item_to_move.is_editable(0))
+		new_item.set_metadata(0, item_to_move.get_metadata(0))
 
 		# Copy icon if available
 		if item_to_move.get_icon(0):
@@ -195,30 +236,27 @@ func _drop_data(position, data):
 		# Remove old item
 		item_to_move.free()
 
-		# Reinsert the new item at the correct position
+		# Sort and reinsert
 		var children = []
 		var child = new_parent.get_first_child()
 		while child:
 			children.append(child)
 			child = child.get_next()
 
-		# Sort items to place the new item at the correct index
 		children.sort_custom(func(a, b): return a.get_index() < b.get_index())
 
-		# Reorder children in parent
 		for i in range(children.size()):
 			if children[i] == new_item:
 				children.remove_at(i)
 				children.insert(target_index, new_item)
 				break
 
-		# Refresh the tree by reassigning children
+		# Refresh tree hierarchy
 		for child1 in children:
 			new_parent.remove_child(child1)
 			new_parent.add_child(child1)
 
 	queue_redraw()
-	print("[SUCCESS] Items reordered or moved successfully!")
 
 # === GRAPHICS ===
 func create_nine_slice_background(texture: Texture2D) -> StyleBoxTexture:

@@ -1,42 +1,60 @@
-[gd_scene load_steps=5 format=3 uid="uid://pemj04dkxrc"]
+[gd_scene load_steps=8 format=3 uid="uid://pemj04dkxrc"]
 
-[ext_resource type="PackedScene" uid="uid://bjwl4ony6ha25" path="res://Tilemap/Tilemap.tscn" id="1_khby1"]
-[ext_resource type="Script" uid="uid://cb3j7qs4awkhr" path="res://Path.gd" id="3_f3t31"]
-[ext_resource type="PackedScene" uid="uid://jyf780tpg4cd" path="res://Command_Tree/command_tree.tscn" id="4_1bvp3"]
-[ext_resource type="PackedScene" uid="uid://c5npq1v0hctjx" path="res://Command_GUI/command_gui.tscn" id="5_p6jpk"]
+[ext_resource type="Script" uid="uid://cxnhstdpo0itd" path="res://Scenes/Main/main.gd" id="1_2a143"]
+[ext_resource type="PackedScene" uid="uid://burn6ntowievh" path="res://Player/Player.tscn" id="1_p6jpk"]
+[ext_resource type="PackedScene" uid="uid://jyf780tpg4cd" path="res://Commands_GUI/command_tree.tscn" id="4_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://6ca7pbt6d5x7" path="res://Scenes/Submain/tilemap.tscn" id="5_2a143"]
+[ext_resource type="PackedScene" uid="uid://c5npq1v0hctjx" path="res://Commands_GUI/command_gui.tscn" id="5_p6jpk"]
+[ext_resource type="PackedScene" uid="uid://cwviexd7nekgy" path="res://Commands_GUI/command_map.tscn" id="5_xlvfx"]
+[ext_resource type="Texture2D" uid="uid://bc547gyggqu0o" path="res://Sprites/stuckintimeref.jpg" id="6_2a143"]
 
 [node name="Main" type="Node2D"]
+script = ExtResource("1_2a143")
 
-[node name="Path" type="Node2D" parent="."]
-script = ExtResource("3_f3t31")
-
-[node name="Tilemap" parent="." instance=ExtResource("1_khby1")]
-position = Vector2(-570, -175)
-scale = Vector2(1.8, 1.8)
-
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Player" parent="." instance=ExtResource("1_p6jpk")]
+z_index = 1
 
 [node name="Game_GUI" type="Control" parent="."]
+z_index = 50
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 32.0
+offset_bottom = 32.0
 
 [node name="Command_Tree" parent="Game_GUI" instance=ExtResource("4_1bvp3")]
 layout_mode = 0
-offset_left = 300.0
-offset_top = -250.0
-offset_right = 450.0
-offset_bottom = 250.0
+offset_left = 768.0
+offset_top = 52.0
+offset_right = 941.0
+offset_bottom = 612.0
 
 [node name="Command_GUI" parent="Game_GUI" instance=ExtResource("5_p6jpk")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 305.0
-offset_top = 266.0
-offset_right = 305.0
-offset_bottom = 266.0
+offset_left = 966.0
+offset_top = 225.0
+offset_right = 1115.0
+offset_bottom = 300.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Command_Map" parent="Game_GUI" instance=ExtResource("5_xlvfx")]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 2.25
+anchor_right = 24.0
+anchor_bottom = 20.25
+offset_right = -6.10352e-05
+offset_bottom = -6.10352e-05
+
+[node name="TileMap" parent="." instance=ExtResource("5_2a143")]
+position = Vector2(0, 72)
+
+[node name="Stuckintimeref" type="Sprite2D" parent="."]
+visible = false
+z_index = -1
+position = Vector2(572, 327)
+scale = Vector2(0.6, 0.591667)
+texture = ExtResource("6_2a143")
