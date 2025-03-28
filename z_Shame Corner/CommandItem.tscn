@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://caolaei1tynqh"]
 
-[ext_resource type="Script" uid="uid://dvxwu0f2a1u3e" path="res://z_GUI_Command/CommandItem.gd" id="1_ecqdc"]
+[ext_resource type="Script" uid="uid://dvxwu0f2a1u3e" path="res://z_Shame Corner/CommandItem.gd" id="1_ecqdc"]
 
 [node name="CommandItem" type="Control"]
 custom_minimum_size = Vector2(0, 20)

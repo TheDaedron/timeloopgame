@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ed31mo7s2kyo"]
 
-[ext_resource type="Script" uid="uid://dbe08nv53x6x5" path="res://z_GUI_Command/CommandFolder.gd" id="1_t2e0i"]
-[ext_resource type="Script" uid="uid://dj0s1wqtr5vc4" path="res://z_GUI_Command/VboxDebug.gd" id="2_6emxq"]
+[ext_resource type="Script" uid="uid://dbe08nv53x6x5" path="res://z_Shame Corner/CommandFolder.gd" id="1_t2e0i"]
+[ext_resource type="Script" uid="uid://dj0s1wqtr5vc4" path="res://z_Shame Corner/VboxDebug.gd" id="2_6emxq"]
 
 [node name="CommandFolder" type="Control"]
 custom_minimum_size = Vector2(0, 20)

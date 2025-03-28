@@ -2,10 +2,10 @@ extends Node
 
 var commands = []  # Store command names
 @onready var tree = find_child("Command_Tree")
-@onready var player = $Player
+signal command_given(command: String)
 var root_item: TreeItem
 
-const COMMAND_DELAY = 0.25  # 0.5 seconds delay between commands
+const COMMAND_DELAY = 0.25  # 0.25 seconds delay between commands
 
 func _input(event):
 	if event.is_action_pressed("ui_accept"):  # "Enter" key in default Godot input map
@@ -49,20 +49,6 @@ func execute_commands_with_delay():
 # Coroutine for delayed execution
 func run_commands():
 	for command in commands:
-		match command:
-			"move_up":
-				player.move(Vector2.UP)
-			"move_down":
-				player.move(Vector2.DOWN)
-			"move_left":
-				player.move(Vector2.LEFT)
-			"move_right":
-				player.move(Vector2.RIGHT)
-			"interact":
-				player.interact()
-			"speak":
-				player.speak()
-			"attack":
-				player.attack()
-		
+		emit_signal("command_given", command)
+
 		await get_tree().create_timer(COMMAND_DELAY).timeout  # Wait before next command

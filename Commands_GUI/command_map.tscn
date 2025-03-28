@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cwviexd7nekgy"]
+[gd_scene load_steps=2 format=3 uid="uid://cwviexd7nekgy"]
 
 [ext_resource type="Script" uid="uid://bgs4ubgrofbhv" path="res://Commands_GUI/command_map.gd" id="1_8lu8k"]
-[ext_resource type="PackedScene" uid="uid://qxlqqdsiisfh" path="res://Tilemap/tile_map_layer.tscn" id="2_r1fm6"]
 
 [node name="Command_Map" type="Control"]
 layout_mode = 3
@@ -43,7 +42,3 @@ offset_top = 273.0
 offset_right = 733.0
 offset_bottom = 304.0
 text = ">"
-
-[node name="TileMapLayer" parent="." instance=ExtResource("2_r1fm6")]
-visible = false
-z_index = -1

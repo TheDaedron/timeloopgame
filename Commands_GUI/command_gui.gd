@@ -1,6 +1,6 @@
 extends Control
 
-@onready var command_tree: Tree = $"../Command_Tree"  # Adjust path if needed
+@onready var command_tree: Tree = $"../Command_Tree"
 var button_sprite_sheet = preload("res://Sprites/_sheet_window_28.png")
 
 func _ready():
@@ -82,7 +82,7 @@ func create_nine_slice_background(texture: Texture2D) -> StyleBoxTexture:
 	var stylebox = StyleBoxTexture.new()
 	stylebox.texture = texture
 	
-	# Define the size of the fixed borders (adjust these values)
+	# Define the size of the fixed borders
 	stylebox.region_rect = Rect2(Vector2.ZERO, Vector2(48 ,48))
 
 	# Set 9-slice borders using content margins

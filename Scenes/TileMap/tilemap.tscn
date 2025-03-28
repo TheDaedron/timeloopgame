@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://6ca7pbt6d5x7"]
+
+[ext_resource type="Script" uid="uid://b0qpfl2slvcgm" path="res://Scenes/TileMap/tilemap.gd" id="1_i1eik"]
+[ext_resource type="PackedScene" uid="uid://qxlqqdsiisfh" path="res://Tilemap/tile_map_layer.tscn" id="2_oc16v"]
+[ext_resource type="PackedScene" uid="uid://burn6ntowievh" path="res://Player/Player.tscn" id="3_8a3l3"]
+
+[node name="TileMap" type="Node2D"]
+script = ExtResource("1_i1eik")
+
+[node name="Player" parent="." instance=ExtResource("3_8a3l3")]
+z_index = 1
+
+[node name="TileMapLayer" parent="." instance=ExtResource("2_oc16v")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(384, 288)
+
+[node name="DebugLine" type="Line2D" parent="."]
+visible = false
+z_index = 2
+position = Vector2(-52, 25)
+points = PackedVector2Array(362, 205, 1170, 271, 1937, 254, 2613, 234, 2716, 787, 1909, 770, 1110, 819, 314, 733, 314, 1335, 1076, 1329, 1895, 1355, 2648, 1330, 2702, 1920, 2014, 1975, 1096, 1784, 388, 1946)
+default_color = Color(1, 0.317596, 0.310885, 1)

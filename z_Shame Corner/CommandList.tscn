@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://8hkrnfcbe5bv"]
 
-[ext_resource type="Script" uid="uid://vr1s740538gn" path="res://z_GUI_Command/CommandList.gd" id="1_dw2xj"]
+[ext_resource type="Script" uid="uid://vr1s740538gn" path="res://z_Shame Corner/CommandList.gd" id="1_dw2xj"]
 
 [node name="CommandList" type="Control"]
 layout_mode = 3
