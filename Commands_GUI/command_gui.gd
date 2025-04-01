@@ -1,20 +1,25 @@
 extends Control
 
-@onready var command_tree: Tree = $"../Command_Tree"
 var button_sprite_sheet = preload("res://Sprites/_sheet_window_28.png")
 
-func _ready():
+var command_tree
+
+func _ready() -> void:
+	SystemManager._set_system("command_gui", self)
+
+func _all_ready() -> void:
+	command_tree = SystemManager.get_system("command_tree")
+	
 	# Create a nine-slice background from a sprite sheet
 	var button_slice_bg = create_nine_slice_background(button_sprite_sheet)
 
 	# Apply the custom theme to each Button object in the scene
 	var theme = Theme.new()
 	theme.set_stylebox("normal", "Button", button_slice_bg)
-	theme.set_stylebox("focus", "Button", StyleBoxEmpty.new())  # Remove focus outline
-	theme.set_stylebox("hover", "Button", button_slice_bg)  # Ensure hover matches normal
+	theme.set_stylebox("hover", "Button", button_slice_bg)
 
 	# Find and apply theme to all buttons in the scene
-	var buttons = [
+	var guiButtons = [
 		find_child("Move_Up"),
 		find_child("Move_Down"),
 		find_child("Move_Left"),
@@ -24,25 +29,18 @@ func _ready():
 		find_child("Action_Attack")
 	]
 
-	for i in range(buttons.size()):
-		var button = buttons[i]
-		if button:
-			button.theme = theme
-			button.mouse_default_cursor_shape = Control.CURSOR_ARROW  # Ensure no unexpected cursor changes
-			button.pressed.connect(func(): _handle_button_press(i))
+	for i in guiButtons.size():
+		var guiButton = guiButtons[i]
+		guiButton.theme = theme
+		guiButton.mouse_default_cursor_shape = Control.CURSOR_ARROW
+		guiButton.focus_mode = Control.FOCUS_NONE
+		guiButton.pressed.connect( func():
+			_handle_button_press(i)
+		)
 
-func _handle_button_press(index: int):
+func _handle_button_press(index: int) -> void:
 	var command_name : String
 	var metadata_name : String
-	
-	if not command_tree:
-		print("[ERROR] Command Tree not found!")
-		return
-
-	var root = command_tree.get_root()
-	if not root:
-		print("[ERROR] Command Tree root not found!")
-		return
 
 	match index:
 		0: 
@@ -69,13 +67,7 @@ func _handle_button_press(index: int):
 		_:
 			print("[ERROR] Invalid button index:", index)
 
-	var new_command = root.create_child()
-	new_command.set_text(0, command_name)
-	new_command.set_editable(0, false)
-	new_command.set_meta("type", "command")
-	new_command.set_metadata(0, metadata_name)
-
-	print("[INFO] Added command:", command_name)
+	command_tree._add_command(command_name, metadata_name)
 
 # === GRAPHICS ===
 func create_nine_slice_background(texture: Texture2D) -> StyleBoxTexture:

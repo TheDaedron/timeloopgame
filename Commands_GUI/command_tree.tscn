@@ -2,7 +2,14 @@
 
 [ext_resource type="Script" uid="uid://ct03muhpjmwkv" path="res://Commands_GUI/command_tree.gd" id="1_1i8o7"]
 
-[node name="Command_Tree" type="Tree"]
+[node name="Command_Tree" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 offset_right = 200.0
 offset_bottom = 400.0
+
+[node name="Tree" type="Tree" parent="."]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 595.0
 script = ExtResource("1_1i8o7")

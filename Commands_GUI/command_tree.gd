@@ -9,8 +9,11 @@ var drop_type = ""  # Can be "above", "on", "below"
 
 var history = []  # Stores tree states for undo/redo
 
+func _ready() -> void:
+	SystemManager._set_system("command_tree", self)
+
 # Set up the tree UI (theme and behavior)
-func _ready():
+func _all_ready() -> void:
 	# Create a nine-slice background from a sprite sheet
 	var tree_slice_bg = create_nine_slice_background(tree_sprite_sheet)
 
@@ -47,7 +50,7 @@ func _draw():
 		draw_line(Vector2(item_rect.position.x, line_y), Vector2(item_rect.position.x + item_rect.size.x, line_y), Color(1, 1, 1), 2)
 
 # === FUNCTIONS ===
-func _add_folder(name: String):
+func _add_folder(name: String) -> void:
 	var folder = root_item.create_child()
 	folder.set_text(0, name)
 	folder.set_editable(0, true)
@@ -58,11 +61,12 @@ func _add_folder(name: String):
 	if folder_icon:
 		folder.set_icon(0, folder_icon)
 
-func _add_command(name: String):
+func _add_command(commandName: String, metadata: String) -> void:
 	var command = root_item.create_child()
-	command.set_text(0, name)
+	command.set_text(0, commandName)
 	command.set_editable(0, false)  # Commands should not be renamed
 	command.set_meta("type", "command")
+	command.set_metadata(0, metadata)
 	
 	# Load icon if exists
 	var command_icon = load("res://Sprites/command_icon.png") if ResourceLoader.exists("res://Sprites/command_icon.png") else null
@@ -82,14 +86,14 @@ func _toggle_expand(item: TreeItem):
 	tween.tween_property(item, "modulate:a", 1.0, 0.15)
 
 # Undo/Redo System
-func save_state():
-	history.append(get_tree_structure_as_dict())
+#func save_state():
+#	history.append(get_tree_structure_as_dict())
 
-func undo():
-	if history.is_empty():
-		return
-	var last_state = history.pop_back()
-	restore_tree_from_dict(last_state)
+#func undo():
+#	if history.is_empty():
+#		return
+#	var last_state = history.pop_back()
+#	restore_tree_from_dict(last_state)
 
 func get_tree_structure_as_dict():
 	var data = []
@@ -99,14 +103,14 @@ func get_tree_structure_as_dict():
 		child = child.get_next()
 		return data
 
-func restore_tree_from_dict(data):
-	root_item.clear_children()
-	for entry in data:
-		if entry["type"] == "folder":
-			var folder = _add_folder(entry["name"])
-			folder.collapsed = entry["collapsed"]
-		else:
-			_add_command(entry["name"])
+#func restore_tree_from_dict(data):
+#	root_item.clear_children()
+#	for entry in data:
+#		if entry["type"] == "folder":
+#			var folder = _add_folder(entry["name"])
+#			folder.collapsed = entry["collapsed"]
+#		else:
+#			_add_command(entry["name"])
 
 # Helper function to check if `potential_child` is a descendant of `parent_item`
 func _is_descendant(parent_item: TreeItem, potential_child: TreeItem) -> bool:
