@@ -1,12 +1,12 @@
 [gd_scene load_steps=4 format=3 uid="uid://blvhbhoy0tx3k"]
 
-[ext_resource type="Script" uid="uid://bspdfooh2ngo4" path="res://Scenes/Game Controller/system_manager.gd" id="1_na6n5"]
+[ext_resource type="Script" uid="uid://bspdfooh2ngo4" path="res://Scenes/Game Controller/script_manager.gd" id="1_na6n5"]
 [ext_resource type="Script" uid="uid://cr30h6nsk5t1l" path="res://Scenes/Game Controller/game_manager.gd" id="2_h7upe"]
 [ext_resource type="Script" uid="uid://ce084fwgbgypq" path="res://Scenes/Game Controller/tile_manager.gd" id="3_ojdci"]
 
 [node name="GameController" type="Node"]
 
-[node name="SystemManager" type="Node" parent="."]
+[node name="ScriptManager" type="Node" parent="."]
 script = ExtResource("1_na6n5")
 
 [node name="GameManager" type="Node" parent="."]

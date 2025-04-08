@@ -1,69 +1,66 @@
 extends Node2D
 
-@export var tile_size: int = 32
-
 var tile_manager
-var player
+var tile_size : int
 
 func _ready() -> void:
-	SystemManager.connect("systems_ready", _all_ready)
+	ScriptManager.connect("scripts_ready", all_ready)
 	visible = false
 
-func _all_ready() -> void:
-	tile_manager = SystemManager.get_system("TileManager")
+func all_ready() -> void:
+	tile_manager = ScriptManager.get_script_node("TileManager")
+	tile_size = tile_manager.TILE_SIZE.x
 
 func _process(_delta):
-	#if SystemManager.all_systems_ready():
-	#	tile_manager = SystemManager.get_system("TileManager")
-	queue_redraw()  # Continuously update overlay in real-time
+	if visible:
+		queue_redraw()  # Continuously update overlay in real-time
 
 func _input(event):
 	if event.is_action_pressed("ui_debug_toggle"):
-		print("ui_debug_toggle pressed")
 		visible = not visible
 
 func _draw():
-	if tile_manager == null:
+	if not visible:
 		return
+
+	var font := ThemeDB.fallback_font
+	var font_size := ThemeDB.fallback_font_size
 
 	for y in tile_manager.world_size.y:
 		for x in tile_manager.world_size.x:
 			var tile_pos = Vector2i(x, y)
 			var tile_data = tile_manager.get_tile_data(tile_pos)
 			if tile_data == null:
+				printerr("[ERROR: Tile_Debug_Overlay]: Attempted access to tile_data that doesn't exist.")
 				continue
 
-			var screen_pos = tile_pos * tile_size
-			var color = Color(0, 0, 0, 0) if tile_data.is_walkable else Color(1, 0, 0, 0.3)
-
-			# Calculate overlay color with alpha based on tile_darkness (range 0 to 1)
+			var screen_pos = tile_pos * tile_manager.TILE_SIZE
+			
+			# Darkness overlay
 			var alpha = clamp(tile_data.tile_darkness / 100.0, 0, 1)
 			var overlay_color = Color(0, 0, 0, alpha)
-
-			draw_rect(Rect2(screen_pos, Vector2(tile_size, tile_size)), overlay_color)
+			draw_rect(Rect2(screen_pos, tile_manager.TILE_SIZE), overlay_color)
 			
-			# Draw semi-transparent tile box
-			draw_rect(Rect2(screen_pos, Vector2(tile_size, tile_size)), color)
-
-			# Draw level number (centered)
-			var default_font = ThemeDB.fallback_font
-			var default_font_size = ThemeDB.fallback_font_size
+			# Non-walkable tile overlay
+			if not tile_data.is_walkable:
+				var blocked_color = Color(1, 0, 0, 0.3)
+				draw_rect(Rect2(screen_pos, tile_manager.TILE_SIZE), blocked_color)
 
 			draw_string(
-				default_font,
+				font,
 				Vector2(screen_pos) + Vector2(0, tile_size / 2),
 			 	str(tile_data.level),
 				HORIZONTAL_ALIGNMENT_CENTER, 
 				-1, 
-				default_font_size,
+				font_size,
 				Color.WHITE
 			)
 			draw_string(
-				default_font,
+				font,
 				Vector2(screen_pos) + Vector2(0, tile_size),
 			 	str(tile_data.tile_darkness),
 				HORIZONTAL_ALIGNMENT_CENTER, 
 				-1, 
-				default_font_size,
+				font_size,
 				Color.BLUE
 			)

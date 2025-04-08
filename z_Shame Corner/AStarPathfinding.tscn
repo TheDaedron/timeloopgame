@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bdebhlf8r1t2o"]
 
-[ext_resource type="Script" uid="uid://cym43mdtkn4ii" path="res://AStarPathfinding.gd" id="1_2vnui"]
+[ext_resource type="Script" uid="uid://cym43mdtkn4ii" path="res://z_Shame Corner/AStarPathfinding.gd" id="1_2vnui"]
 
 [node name="AStarPathfinding" type="Node2D"]
 script = ExtResource("1_2vnui")

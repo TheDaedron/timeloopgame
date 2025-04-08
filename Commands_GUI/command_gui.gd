@@ -5,10 +5,10 @@ var button_sprite_sheet = preload("res://Sprites/_sheet_window_28.png")
 var command_tree
 
 func _ready() -> void:
-	SystemManager._set_system("command_gui", self)
+	ScriptManager.set_script_node("command_gui", self)
 
-func _all_ready() -> void:
-	command_tree = SystemManager.get_system("command_tree")
+func all_ready() -> void:
+	command_tree = ScriptManager.get_script_node("command_tree")
 	
 	# Create a nine-slice background from a sprite sheet
 	var button_slice_bg = create_nine_slice_background(button_sprite_sheet)
@@ -35,10 +35,10 @@ func _all_ready() -> void:
 		guiButton.mouse_default_cursor_shape = Control.CURSOR_ARROW
 		guiButton.focus_mode = Control.FOCUS_NONE
 		guiButton.pressed.connect( func():
-			_handle_button_press(i)
+			handle_button_press(i)
 		)
 
-func _handle_button_press(index: int) -> void:
+func handle_button_press(index: int) -> void:
 	var command_name : String
 	var metadata_name : String
 
@@ -67,7 +67,7 @@ func _handle_button_press(index: int) -> void:
 		_:
 			print("[ERROR] Invalid button index:", index)
 
-	command_tree._add_command(command_name, metadata_name)
+	command_tree.add_command(command_name, metadata_name)
 
 # === GRAPHICS ===
 func create_nine_slice_background(texture: Texture2D) -> StyleBoxTexture:

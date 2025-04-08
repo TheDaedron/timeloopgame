@@ -10,9 +10,9 @@ signal map_button_pressed(index: int)
 ]
 
 func _ready():
-	SystemManager._set_system("command_map", self)
+	ScriptManager.set_script_node("command_map", self)
 
-func _all_ready():
+func all_ready():
 	# Loops through each button and formats & connects them.
 	for i in mapButtons.size():
 		var mapButton = mapButtons[i]

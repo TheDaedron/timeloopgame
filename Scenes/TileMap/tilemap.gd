@@ -2,69 +2,71 @@ extends Node2D
 
 @onready var tile_map_layer: TileMapLayer = $TileMapLayer
 @onready var camera: Camera2D = $Camera2D
-@onready var player = $Player
 
-@export var tile_size: Vector2i = Vector2i(32, 32) # Each tile is 32x32 pixels
-@export var chunk_size: Vector2i = Vector2i(24, 18) # Each chunk is 24x18 tiles
+var tile_size: Vector2i
+var chunk_size: Vector2i
+var num_chunks: Vector2i
+var chunk_center: Vector2i
 
-# TODO: Should rename this to something else. World size should be tile_size * chunk_size * num_chucks
-@export var world_size: Vector2i = Vector2i(4, 4)   # 4x4 chunks
-
-# These can probably be calulated at _all_ready
+# This can probably be calulated at all_ready
 var current_chunk = Vector2i(2, 2) # The active chunk
-var chunk_center = Vector2i(384, 288)  # tile_size * chunk_size / 2
 
 var last_player_chunk: Vector2i = Vector2i(-1, -1)  # invalid default
 var follow_player_mode := false
 
+var Tile_Manager : Node
 var command_map: Node
+var player : Node
 
-func _ready():
-	SystemManager._set_system("tilemap", self)
+func _ready() -> void:
+	ScriptManager.set_script_node("tilemap", self)
 
-func _all_ready():
-	command_map = SystemManager.get_system("command_map")
-	player = SystemManager.get_system("player")
-	_connect_to_command_map()
-	_update_chunk_display()
+func all_ready() -> void:
+	Tile_Manager = ScriptManager.get_script_node("TileManager")
+	command_map = ScriptManager.get_script_node("command_map")
+	player = ScriptManager.get_script_node("player")
+	
+	tile_size = Tile_Manager.TILE_SIZE
+	chunk_size = Tile_Manager.CHUNK_SIZE
+	num_chunks = Tile_Manager.NUM_CHUNKS
+	chunk_center = Tile_Manager.chunk_center
+	
+	connect_to_command_map()
+	update_chunk_display()
 
-func _update_chunk_display():
+func update_chunk_display() -> void:
 	var chunk_offset = current_chunk * chunk_size * tile_size
 	camera.position = chunk_center + chunk_offset
 
 #region Handling Command_Map
-func _connect_to_command_map():
-		command_map.map_button_pressed.connect(_handle_map_button_press)
-		_update_map_button_visibility()
+func connect_to_command_map() -> void:
+		command_map.map_button_pressed.connect(handle_map_button_press)
+		update_map_button_visibility()
 
-func _handle_map_button_press(index: int):
-	if follow_player_mode:
-		return
-
-	var command_name : String
+func handle_map_button_press(index: int):
 	var map_direction : Vector2i
 
 	match index:
-		0: map_direction = Vector2i(0 , -1)
-		1: map_direction = Vector2i(0 , 1)
-		2: map_direction = Vector2i(-1 , 0)
-		3: map_direction = Vector2i(1 , 0)
+		0: map_direction = Vector2i.UP
+		1: map_direction = Vector2i.DOWN
+		2: map_direction = Vector2i.LEFT
+		3: map_direction = Vector2i.RIGHT
 		_: print("[ERROR - TileMap] Invalid button index:", index)
 
 	var new_chunk = current_chunk + map_direction
 
 	current_chunk = new_chunk
-	_update_chunk_display()
-	_update_map_button_visibility()
+	update_chunk_display()
+	update_map_button_visibility()
 
-func _update_map_button_visibility():
+func update_map_button_visibility() -> void:
 	command_map.mapButtons[0].visible = current_chunk.y > 0 # Up
-	command_map.mapButtons[1].visible = current_chunk.y < world_size.y - 1 # Down
+	command_map.mapButtons[1].visible = current_chunk.y < num_chunks.y - 1 # Down
 	command_map.mapButtons[2].visible = current_chunk.x > 0 # Left
-	command_map.mapButtons[3].visible = current_chunk.x < world_size.x - 1 # Right
+	command_map.mapButtons[3].visible = current_chunk.x < num_chunks.x - 1 # Right
 #endregion
 
-func on_player_moved():
+func on_player_moved() -> void:
 	if not follow_player_mode:
 		return
 
@@ -73,4 +75,4 @@ func on_player_moved():
 	if player_chunk != last_player_chunk:
 		current_chunk = player_chunk
 		last_player_chunk = player_chunk
-		_update_chunk_display()
+		update_chunk_display()

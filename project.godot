@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-SystemManager="*res://Scenes/Game Controller/system_manager.gd"
+ScriptManager="*res://Scenes/Game Controller/script_manager.gd"
 
 [display]
 
