@@ -1,5 +1,4 @@
 extends Node
-class_name TileManager
 
 const LIGHT_RADIUS = 3      # tiles are fully lit if distance <= 3
 const MAX_LIGHT_DISTANCE = 8  # beyond this, darkness is 100
@@ -34,7 +33,7 @@ func all_ready() -> void:
 
 func get_tile_data(pos: Vector2i) -> TileProperties:
 	if not is_in_bounds(pos):
-		push_warning("Requested tile out of bounds: " + str(pos))
+		Debug.warning("Requested tile out of bounds: %s" % [pos])
 		return null
 	return tile_data_grid[pos.y][pos.x]
 
@@ -99,21 +98,21 @@ func generate_random_map_json(size: Vector2i, path: String) -> void:
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file:
 		file.store_string(JSON.stringify(full_data, "\t"))
-		print("Random map JSON generated at: ", path)
+		Debug.info("Random map generated at: %s" % [path])
 	else:
-		push_error("Failed to open file for writing: " + path)
+		Debug.error("Failed to open file for writing: %s" % [path])
 
 func load_from_json(path: String) -> Array:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if not file:
-		push_error("Could not open file: " + path)
+		Debug.error("Could not find file: %s" % [path])
 		return []
 
 	var json_text := file.get_as_text()
 	var parsed : Variant = JSON.parse_string(json_text)
 
 	if typeof(parsed) != TYPE_DICTIONARY:
-		push_error("Invalid JSON format")
+		Debug.error("Invalid JSON format.")
 		return []
 
 	var size = Vector2i(parsed.get("size", [0, 0])[0], parsed.get("size", [0, 0])[1])
@@ -131,7 +130,7 @@ func load_from_json(path: String) -> Array:
 		if y < new_grid.size() and x < new_grid[y].size():
 			new_grid[y][x].from_dict(tile_dict)
 
-	print("JSON loaded from: ", path)
+	Debug.info("JSON loaded from: %s" % [path])
 	return new_grid
 
 func _save_to_json(path: String) -> void:
@@ -152,4 +151,4 @@ func _save_to_json(path: String) -> void:
 	if file:
 		file.store_string(JSON.stringify(full_data, "\t"))
 	else:
-		push_error("Failed to open file for saving: " + path)
+		Debug.error("Failed to open file for saving: %s" % [path])

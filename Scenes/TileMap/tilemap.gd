@@ -9,7 +9,7 @@ var num_chunks: Vector2i
 var chunk_center: Vector2i
 
 # This can probably be calulated at all_ready
-var current_chunk = Vector2i(2, 2) # The active chunk
+var current_chunk = Vector2i(0, 0) # The active chunk
 
 var last_player_chunk: Vector2i = Vector2i(-1, -1)  # invalid default
 var follow_player_mode := false
@@ -51,7 +51,7 @@ func handle_map_button_press(index: int):
 		1: map_direction = Vector2i.DOWN
 		2: map_direction = Vector2i.LEFT
 		3: map_direction = Vector2i.RIGHT
-		_: print("[ERROR - TileMap] Invalid button index:", index)
+		_: Debug.error("Invalid button index: %s" % [index])
 
 	var new_chunk = current_chunk + map_direction
 

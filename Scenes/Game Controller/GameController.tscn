@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://blvhbhoy0tx3k"]
+[gd_scene load_steps=5 format=3 uid="uid://blvhbhoy0tx3k"]
 
 [ext_resource type="Script" uid="uid://bspdfooh2ngo4" path="res://Scenes/Game Controller/script_manager.gd" id="1_na6n5"]
 [ext_resource type="Script" uid="uid://cr30h6nsk5t1l" path="res://Scenes/Game Controller/game_manager.gd" id="2_h7upe"]
 [ext_resource type="Script" uid="uid://ce084fwgbgypq" path="res://Scenes/Game Controller/tile_manager.gd" id="3_ojdci"]
+[ext_resource type="Script" uid="uid://ca215syxgkt6h" path="res://Scenes/Game Controller/tree_manager.gd" id="4_esu0f"]
 
 [node name="GameController" type="Node"]
 
@@ -14,3 +15,6 @@ script = ExtResource("2_h7upe")
 
 [node name="TileManager" type="Node" parent="."]
 script = ExtResource("3_ojdci")
+
+[node name="TreeManager" type="Node" parent="."]
+script = ExtResource("4_esu0f")

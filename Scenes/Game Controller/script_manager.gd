@@ -25,6 +25,7 @@ var set_scripts: Dictionary = {}
 # Stores the script in the set_scripts dictionary and checks readiness
 func set_script_node(script: String, node: Node) -> void:
 	set_scripts[script] = node
+	Debug.info("Script %s set" % [script])
 	check_ready()
 
 # Returns the script's node (Node) if the script exists in set_scripts dictionary
@@ -32,7 +33,7 @@ func set_script_node(script: String, node: Node) -> void:
 func get_script_node(script: String) -> Node:
 	if set_scripts.has(script):
 		return set_scripts[script]
-	printerr("[Warning - scriptManager]: script '%s' is not set." % script)
+	Debug.error("Script %s is not set." % [script])
 	return null
 #endregion
 
@@ -45,7 +46,7 @@ func check_ready() -> void:
 			if script.has_method("all_ready"):
 				script.all_ready()
 			else:
-				printerr("[Warning - ScriptManager]: script '%s' does not have an all_ready method." % REQUIRED_SCRIPT)
+				Debug.error("Script %s does not have an all_ready method." % [REQUIRED_SCRIPT])
 
 		emit_signal("scripts_ready")
 
@@ -54,4 +55,5 @@ func all_scripts_ready() -> bool:
 	for REQUIRED_SCRIPT in REQUIRED_SCRIPTS:
 		if not set_scripts.has(REQUIRED_SCRIPT):
 			return false
+	Debug.info("All scripts ready.")
 	return true

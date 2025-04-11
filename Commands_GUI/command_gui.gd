@@ -65,7 +65,7 @@ func handle_button_press(index: int) -> void:
 			command_name = "Attack"
 			metadata_name = "attack"
 		_:
-			print("[ERROR] Invalid button index:", index)
+			Debug.error("Invalid button index: %s" % [index])
 
 	command_tree.add_command(command_name, metadata_name)
 

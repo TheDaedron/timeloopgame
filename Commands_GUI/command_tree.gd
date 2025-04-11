@@ -6,6 +6,10 @@ var root_item: TreeItem  # Root node of the tree
 var drop_position = Vector2.ZERO
 var drop_target: TreeItem = null
 var drop_type = ""  # Can be "above", "on", "below"
+var last_command_item: TreeItem = null
+var last_command_count: int = 1
+
+signal tree_changed
 
 func _ready() -> void:
 	ScriptManager.set_script_node("command_tree", self)
@@ -51,10 +55,27 @@ func _draw():
 func add_folder(name: String) -> void:
 	var folder = root_item.create_child()
 	setup_item(folder, name, "folder", true, "res://Sprites/folder_icon.png")
+	
+	emit_signal("tree_changed")
 
 func add_command(name: String, metadata: String) -> void:
-	var command = root_item.create_child()
-	setup_item(command, name, "command", false, "res://Sprites/command_icon.png", metadata)
+	if last_command_item and last_command_item.get_text(0).begins_with(name):
+		last_command_count += 1
+		last_command_item.set_text(0, "%s x%d" % [name, last_command_count])
+		var meta = last_command_item.get_metadata(0)
+		meta["repeat_count"] = last_command_count
+		last_command_item.set_metadata(0, meta)
+	else:
+		last_command_item = root_item.create_child()
+		last_command_count = 1
+		setup_item(last_command_item, name, "command", false, "res://Sprites/command_icon.png", metadata)
+		# Override metadata to be a dictionary:
+		last_command_item.set_metadata(0, {
+			"command_name": name,
+			"repeat_count": 1
+		})
+		
+	emit_signal("tree_changed")
 
 func setup_item(item: TreeItem, name: String, type: String, editable: bool, icon_path: String, metadata: String = "") -> void:
 	item.set_text(0, name)
@@ -68,7 +89,7 @@ func setup_item(item: TreeItem, name: String, type: String, editable: bool, icon
 func on_item_edited():
 	var item = get_edited()
 	if item and item.get_meta("type", "") == "folder":
-		print("[INFO] Folder renamed to:", item.get_text(0))
+		Debug.info("Folder renamed to: %s" % [item.get_text(0)])
 
 # Helper function to check if `potential_child` is a descendant of `parent_item`
 func is_descendant(parent_item: TreeItem, potential_child: TreeItem) -> bool:
@@ -164,6 +185,7 @@ func _drop_data(position, data):
 	# Resort children
 	sort_children(new_parent, copy, target_index)
 	queue_redraw()
+	emit_signal("tree_changed")
 
 func sort_children(parent: TreeItem, moved_item: TreeItem, index: int) -> void:
 	var children = []
