@@ -1,20 +1,30 @@
+#tile_manager.gd
 extends Node
 
-const LIGHT_RADIUS = 3      # tiles are fully lit if distance <= 3
-const MAX_LIGHT_DISTANCE = 8  # beyond this, darkness is 100
+# Constants
+const LIGHT_RADIUS: int = 3
+const MAX_LIGHT_DISTANCE: int = 8
+const TILE_SIZE: Vector2i = Vector2i(32, 32)
+const CHUNK_SIZE: Vector2i = Vector2i(24, 18)
+const NUM_CHUNKS: Vector2i = Vector2i(4, 4)
 
-const TILE_SIZE: Vector2i = Vector2i(32, 32) # Each tile is 32x32 pixels
-const CHUNK_SIZE: Vector2i = Vector2i(24, 18) # Each chunk is 24x18 tiles
-const NUM_CHUNKS: Vector2i = Vector2i(4, 4)   # 4x4 chunks
+const MAP_DIRECTIONS = [
+	Vector2i.UP,
+	Vector2i.DOWN,
+	Vector2i.LEFT,
+	Vector2i.RIGHT
+]
 
+# Properties
 var chunk_center: Vector2i
 var world_size: Vector2i
 var tile_data_grid: Array = []
-var astar := AStarGrid2D.new()
 
-var tilemap
-var player
+# Dependencies
+var tilemap: Node
+var gameManager: Node
 
+#region Initialization
 func _ready() -> void:
 	world_size = CHUNK_SIZE * NUM_CHUNKS
 	chunk_center = Vector2i((TILE_SIZE * CHUNK_SIZE) / 2)
@@ -23,20 +33,24 @@ func _ready() -> void:
 
 func all_ready() -> void:
 	tilemap = ScriptManager.get_script_node("tilemap")
+	gameManager = ScriptManager.get_script_node("GameManager")
 	
 	generate_random_map_json(world_size, "user://random_test_map.json")
-	
 	tile_data_grid = load_from_json("user://random_test_map.json")
-	
-	initialize_astar()
-	setup_astar_weights()
+#endregion
 
+#region Tile Data Access
 func get_tile_data(pos: Vector2i) -> TileProperties:
 	if not is_in_bounds(pos):
 		Debug.warning("Requested tile out of bounds: %s" % [pos])
 		return null
 	return tile_data_grid[pos.y][pos.x]
 
+func is_in_bounds(pos: Vector2i) -> bool:
+	return pos.x >= 0 and pos.y >= 0 and pos.x < world_size.x and pos.y < world_size.y
+#endregion
+
+#region Darkness & Lighting
 func update_tile_darkness(player_tile: Vector2i) -> void:
 	for y in tile_data_grid.size():
 		for x in tile_data_grid[y].size():
@@ -52,28 +66,25 @@ func calculate_darkness(tile_pos: Vector2i, player_pos: Vector2i) -> int:
 		return 100
 	else:
 		return int((distance - LIGHT_RADIUS) / (MAX_LIGHT_DISTANCE - LIGHT_RADIUS) * 100)
+#endregion
 
-func is_in_bounds(pos: Vector2i) -> bool:
-	return pos.x >= 0 and pos.y >= 0 and pos.x < world_size.x and pos.y < world_size.y
+#region Chunk Utilities
+func get_chunk_offset(chunk: Vector2i) -> Vector2i:
+	return chunk * CHUNK_SIZE * TILE_SIZE
 
-func initialize_astar() -> void :
-	astar.region = Rect2i(Vector2i.ZERO, world_size * TILE_SIZE)
-	astar.cell_size = Vector2i(1, 1)
-	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
-	astar.update()
+func get_chunk_center_position(chunk: Vector2i) -> Vector2:
+	return chunk_center + get_chunk_offset(chunk)
 
-func setup_astar_weights() -> void:
-	for y in world_size.y:
-		for x in world_size.x:
-			var pos = Vector2i(x, y)
-			var tile = tile_data_grid[y][x]
+func get_chunk_neighbors(chunk: Vector2i) -> Dictionary:
+	return {
+		"up": chunk.y > 0,
+		"down": chunk.y < NUM_CHUNKS.y - 1,
+		"left": chunk.x > 0,
+		"right": chunk.x < NUM_CHUNKS.x - 1
+	}
+#endregion
 
-			if tile.is_walkable:
-				var cost = max(1, tile.level)  # Ensure minimum cost of 1
-				astar.set_point_weight_scale(pos, cost)
-			else:
-				astar.set_point_solid(pos, true)
-
+#region File Management
 func generate_random_map_json(size: Vector2i, path: String) -> void:
 	var tile_list = []
 	randomize()
@@ -133,7 +144,7 @@ func load_from_json(path: String) -> Array:
 	Debug.info("JSON loaded from: %s" % [path])
 	return new_grid
 
-func _save_to_json(path: String) -> void:
+func save_to_json(path: String) -> void:
 	var tile_list = []
 	for y in tile_data_grid.size():
 		for x in tile_data_grid[y].size():
@@ -152,3 +163,4 @@ func _save_to_json(path: String) -> void:
 		file.store_string(JSON.stringify(full_data, "\t"))
 	else:
 		Debug.error("Failed to open file for saving: %s" % [path])
+#endregion

@@ -1,4 +1,4 @@
-extends RefCounted
+extends Resource
 class_name TileProperties
 
 var is_walkable: bool = true

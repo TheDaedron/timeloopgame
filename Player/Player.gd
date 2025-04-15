@@ -27,13 +27,11 @@ func all_ready() -> void:
 	tilemap = ScriptManager.get_script_node("tilemap")
 	
 	tile_size = tileManager.TILE_SIZE
+	position = gameManager.player_start_pos
+	
 	tileManager.update_tile_darkness(get_player_tile())
 	gameManager.command_given.connect(process_commands)
-	gameManager.movement_path_updated.connect(on_movement_path_updated)
-
-func on_movement_path_updated():
-	movement_path = gameManager.movement_path
-	queue_redraw()
+	gameManager.loop_finished.connect(on_loop_finished)
 
 func process_commands(command: String) -> void:
 	if move_commands.has(command):
@@ -65,9 +63,12 @@ func try_move(direction: Vector2, animation_name: String) -> void:
 		if animationPlayer.current_animation != animation_name:
 			animationPlayer.play(animation_name)
 		tilemap.on_player_moved()
-		Debug.info("Player is on tile: %s" % [get_player_tile()])
+		Debug.trace("Player is on tile: %s" % [get_player_tile()])
 	else:
 		Debug.warning("Target tile %s is not walkable" % [target_tile])
+
+func on_loop_finished() -> void:
+	position = gameManager.player_start_pos
 
 func get_player_tile() -> Vector2i:
 	return Vector2i(position) / tile_size
@@ -80,16 +81,3 @@ func speak() -> void:
 
 func attack() -> void:
 	print("Player is attacking")
-
-func _draw():
-	if not gameManager:
-		Debug.warning("GameManager not ready yet!")
-		return
-		
-	Debug.info("Drawing movement path...")
-	
-	if movement_path.size() >= 2:
-		for i in range(movement_path.size() - 1):
-			draw_line(movement_path[i], movement_path[i + 1], Color.GREEN, 2)
-	else:
-		Debug.warning("Not enough points to draw path! (%d points)" % [movement_path.size()])

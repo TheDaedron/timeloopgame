@@ -1,78 +1,94 @@
+# tilemap.gd
 extends Node2D
 
+# Imports
 @onready var tile_map_layer: TileMapLayer = $TileMapLayer
 @onready var camera: Camera2D = $Camera2D
+@onready var path_visualizer: Line2D = $PathVisualizer
 
-var tile_size: Vector2i
-var chunk_size: Vector2i
-var num_chunks: Vector2i
-var chunk_center: Vector2i
+# Properties
+var current_chunk: Vector2i:
+	get:
+		return _current_chunk
+	set(value):
+		_current_chunk = value
+		update_map_chunk_display()
+		update_map_button_visibility()
 
-# This can probably be calulated at all_ready
-var current_chunk = Vector2i(0, 0) # The active chunk
-
-var last_player_chunk: Vector2i = Vector2i(-1, -1)  # invalid default
+var _current_chunk: Vector2i = Vector2i(-1, -1) # Initialization as invalid
+var last_player_chunk: Vector2i = Vector2i(-1, -1) # Initialization as invalid
 var follow_player_mode := false
+var player_chunk: Vector2i
+var movement_path: Array = []
 
-var Tile_Manager : Node
+# Dependencies
+var TileManager: Node
+var GameManager: Node
 var command_map: Node
-var player : Node
+var player: Node
 
+#region Initialization
 func _ready() -> void:
 	ScriptManager.set_script_node("tilemap", self)
+	path_visualizer.clear_points()
 
 func all_ready() -> void:
-	Tile_Manager = ScriptManager.get_script_node("TileManager")
+	TileManager = ScriptManager.get_script_node("TileManager")
+	GameManager = ScriptManager.get_script_node("GameManager")
 	command_map = ScriptManager.get_script_node("command_map")
 	player = ScriptManager.get_script_node("player")
 	
-	tile_size = Tile_Manager.TILE_SIZE
-	chunk_size = Tile_Manager.CHUNK_SIZE
-	num_chunks = Tile_Manager.NUM_CHUNKS
-	chunk_center = Tile_Manager.chunk_center
-	
-	connect_to_command_map()
-	update_chunk_display()
+	current_chunk = player.get_player_tile() / TileManager.CHUNK_SIZE
 
-func update_chunk_display() -> void:
-	var chunk_offset = current_chunk * chunk_size * tile_size
-	camera.position = chunk_center + chunk_offset
-
-#region Handling Command_Map
-func connect_to_command_map() -> void:
-		command_map.map_button_pressed.connect(handle_map_button_press)
-		update_map_button_visibility()
-
-func handle_map_button_press(index: int):
-	var map_direction : Vector2i
-
-	match index:
-		0: map_direction = Vector2i.UP
-		1: map_direction = Vector2i.DOWN
-		2: map_direction = Vector2i.LEFT
-		3: map_direction = Vector2i.RIGHT
-		_: Debug.error("Invalid button index: %s" % [index])
-
-	var new_chunk = current_chunk + map_direction
-
-	current_chunk = new_chunk
-	update_chunk_display()
+	command_map.map_button_pressed.connect(handle_map_button_press)
+	GameManager.movement_path_updated.connect(on_movement_path_updated)
 	update_map_button_visibility()
-
-func update_map_button_visibility() -> void:
-	command_map.mapButtons[0].visible = current_chunk.y > 0 # Up
-	command_map.mapButtons[1].visible = current_chunk.y < num_chunks.y - 1 # Down
-	command_map.mapButtons[2].visible = current_chunk.x > 0 # Left
-	command_map.mapButtons[3].visible = current_chunk.x < num_chunks.x - 1 # Right
+	update_map_chunk_display()
 #endregion
 
+#region Map Chunk Display Handling
+func handle_map_button_press(index: int) -> void:
+	if index < 0 or index >= TileManager.MAP_DIRECTIONS.size():
+		Debug.error("Invalid button index: %s" % [index])
+		return
+
+	current_chunk += TileManager.MAP_DIRECTIONS[index]
+
+func update_map_button_visibility() -> void:
+	var neighbors = TileManager.get_chunk_neighbors(current_chunk)
+	command_map.mapButtons[0].visible = neighbors["up"]
+	command_map.mapButtons[1].visible = neighbors["down"]
+	command_map.mapButtons[2].visible = neighbors["left"]
+	command_map.mapButtons[3].visible = neighbors["right"]
+
+func update_map_chunk_display() -> void:
+	camera.position = TileManager.get_chunk_center_position(current_chunk)
+	
 func on_player_moved() -> void:
 	if not follow_player_mode:
 		return
 
-	var player_chunk = player.player_tile / chunk_size
+	player_chunk = player.get_player_tile() / TileManager.CHUNK_SIZE
 
 	if player_chunk != last_player_chunk:
 		current_chunk = player_chunk
 		last_player_chunk = player_chunk
-		update_chunk_display()
+		update_map_chunk_display()
+#endregion
+
+#region Path Visualizer
+func on_movement_path_updated():
+	movement_path = GameManager.movement_path
+	update_path_visualizer()
+
+func update_path_visualizer() -> void:
+	if not path_visualizer:
+		Debug.warning("PathVisualizer node is missing.")
+		return
+
+	path_visualizer.clear_points()
+
+	for point in movement_path:
+		var world_position = Vector2(point) + Vector2(TileManager.TILE_SIZE) / 2
+		path_visualizer.add_point(world_position)
+#endregion

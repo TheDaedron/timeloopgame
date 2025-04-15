@@ -13,8 +13,8 @@ const REQUIRED_SCRIPTS = [
 	"command_map",
 	"command_tree",
 	"command_gui",
-	"tilemap",
 	"player",
+	"tilemap",
 ]
 
 # Dictionary to store references to all initialized scripts and their nodes.
@@ -37,6 +37,7 @@ func get_script_node(script: String) -> Node:
 	return null
 #endregion
 
+#region script ready checking
 # Checks if all required scripts have been registered.
 # If all are registered, it calls each script's all_ready() method (if it exists), and emits the `scripts_ready` signal.
 func check_ready() -> void:
@@ -57,3 +58,32 @@ func all_scripts_ready() -> bool:
 			return false
 	Debug.info("All scripts ready.")
 	return true
+#endregion
+
+#region Global Signal Manager
+# signals holds the most recent emitted value for a named global signal
+var signals: Dictionary = {}
+
+# listeners holds arrays of Callables for any global signal
+var listeners: Dictionary = {}
+
+# Emit a global signal (with optional data) that may be received immediately or later
+func emit_global(signal_name: String, data = null) -> void:
+	signals[signal_name] = data
+	if listeners.has(signal_name):
+		for listener in listeners[signal_name]:
+			listener.call_func(data)
+
+# Connect to a global signal; if the signal was already emitted, it triggers immediately
+func connect_global(signal_name: String, method_name: String) -> void:
+	if not listeners.has(signal_name):
+		listeners[signal_name] = []
+
+	var callable = Callable(self, method_name)
+	listeners[signal_name].append(callable)
+
+	# If signal was already emitted, call it immediately
+	if signals.has(signal_name):
+		callable.call(signals[signal_name])
+
+#endregion

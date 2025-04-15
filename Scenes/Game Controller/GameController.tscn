@@ -16,5 +16,7 @@ script = ExtResource("2_h7upe")
 [node name="TileManager" type="Node" parent="."]
 script = ExtResource("3_ojdci")
 
-[node name="TreeManager" type="Node" parent="."]
+[node name="CommandTreeManager" type="Node" parent="."]
 script = ExtResource("4_esu0f")
+
+[node name="GameUIManager" type="Node" parent="."]

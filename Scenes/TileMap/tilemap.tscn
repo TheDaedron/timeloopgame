@@ -16,12 +16,11 @@ z_index = 1
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(384, 288)
 
-[node name="DebugLine" type="Line2D" parent="."]
-visible = false
+[node name="PathVisualizer" type="Line2D" parent="."]
 z_index = 2
-position = Vector2(-52, 25)
 points = PackedVector2Array(362, 205, 1170, 271, 1937, 254, 2613, 234, 2716, 787, 1909, 770, 1110, 819, 314, 733, 314, 1335, 1076, 1329, 1895, 1355, 2648, 1330, 2702, 1920, 2014, 1975, 1096, 1784, 388, 1946)
-default_color = Color(1, 0.317596, 0.310885, 1)
+width = 5.0
+default_color = Color(1.73271e-06, 0.702128, 0.471583, 1)
 
 [node name="TileDebugOverlay" type="Node2D" parent="."]
 script = ExtResource("4_dr6e3")
