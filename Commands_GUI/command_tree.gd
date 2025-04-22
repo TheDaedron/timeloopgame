@@ -9,13 +9,12 @@ var drop_type = ""  # Can be "above", "on", "below"
 var last_command_item: TreeItem = null
 var last_command_count: int = 1
 
-signal tree_changed
-
 func _ready() -> void:
 	ScriptManager.set_script_node("command_tree", self)
+	SignalManager.connect_global("scripts_ready", self, "on_scripts_ready")
 
 # Set up the tree UI (theme and behavior)
-func all_ready() -> void:
+func on_scripts_ready() -> void:
 	# Create a nine-slice background from a sprite sheet
 	var tree_slice_bg = create_nine_slice_background(tree_sprite_sheet)
 
@@ -56,7 +55,7 @@ func add_folder(name: String) -> void:
 	var folder = root_item.create_child()
 	setup_item(folder, name, "folder", true, "res://Sprites/folder_icon.png")
 	
-	emit_signal("tree_changed")
+	SignalManager.emit_global("tree_changed")
 
 func add_command(name: String, metadata: String) -> void:
 	if last_command_item and last_command_item.get_text(0).begins_with(name):
@@ -75,7 +74,7 @@ func add_command(name: String, metadata: String) -> void:
 			"repeat_count": 1
 		})
 		
-	emit_signal("tree_changed")
+	SignalManager.emit_global("tree_changed")
 
 func setup_item(item: TreeItem, name: String, type: String, editable: bool, icon_path: String, metadata: String = "") -> void:
 	item.set_text(0, name)
@@ -185,7 +184,7 @@ func _drop_data(position, data):
 	# Resort children
 	sort_children(new_parent, copy, target_index)
 	queue_redraw()
-	emit_signal("tree_changed")
+	SignalManager.emit_global("tree_changed")
 
 func sort_children(parent: TreeItem, moved_item: TreeItem, index: int) -> void:
 	var children = []

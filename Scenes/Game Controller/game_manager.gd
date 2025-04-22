@@ -2,10 +2,6 @@ extends Node
 
 const COMMAND_DELAY = 0.25  # 0.25 seconds delay between commands
 
-signal command_given(command: String)
-signal movement_path_updated
-signal loop_finished
-
 var command_tree
 var root_item: TreeItem
 var player_start_pos: Vector2i = Vector2i(1920.0, 1440.0)
@@ -22,10 +18,8 @@ var move_commands = {
 
 func _ready() -> void:
 	ScriptManager.set_script_node("GameManager", self)
-
-func all_ready() -> void:
-	command_tree = ScriptManager.get_script_node("command_tree")
-	command_tree.tree_changed.connect(on_command_tree_changed)
+	command_tree = ScriptManager.get_script_node("command_tree", self)
+	SignalManager.connect_global("tree_changed", self, "on_command_tree_changed")
 
 func _input(event):
 	if event.is_action_pressed("ui_accept"):  # "Enter" key in default Godot input map
@@ -39,7 +33,7 @@ func on_command_tree_changed() -> void:
 	Debug.trace("Command tree changed! Rebuilding movement path...")
 	movement_path.clear()
 	get_commands_from_tree()
-	emit_signal("movement_path_updated")
+	SignalManager.emit_global("movement_path_updated")
 
 func get_commands_from_tree():
 	commands.clear()
@@ -91,18 +85,14 @@ func execute_commands_with_delay() -> void:
 
 # Coroutine for delayed execution
 func run_commands() -> void:
-	if commands.is_empty():
-		Debug.warning("No commands to execute.")
-		return
-	
 	for command in commands:
-		emit_signal("command_given", command)
+		SignalManager.emit_global("command_given", command)
 		await get_tree().create_timer(COMMAND_DELAY).timeout
 	
 	# After running all commands, loop!
 	Debug.info("Command sequence finished. Restarting...")
 	
-	emit_signal("loop_finished")
-	await get_tree().create_timer(1.0).timeout  # (optional small pause before restarting)
+	SignalManager.emit_global("loop_finished")
+	await get_tree().create_timer(1.0).timeout  # (small pause before restarting)
 
 	load_and_execute_commands()  # restart the whole flow

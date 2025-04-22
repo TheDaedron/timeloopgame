@@ -17,7 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-ScriptManager="*res://Scenes/Game Controller/script_manager.gd"
+ScriptManager="*res://Utilities/script_manager.gd"
+SignalManager="*res://Utilities/signal_manager.gd"
 Debug="*res://Common/Singletons/Debug.gd"
 
 [display]

@@ -30,18 +30,18 @@ var player: Node
 #region Initialization
 func _ready() -> void:
 	ScriptManager.set_script_node("tilemap", self)
+	TileManager = ScriptManager.get_script_node("TileManager", self)
+	GameManager = ScriptManager.get_script_node("GameManager", self)
+	command_map = ScriptManager.get_script_node("command_map", self)
+	player = ScriptManager.get_script_node("player", self)
+	SignalManager.connect_global("map_button_pressed", self, "handle_map_button_press")
+	SignalManager.connect_global("movement_path_updated", self, "on_movement_path_updated")
+	SignalManager.connect_global("scripts_ready", self, "on_scripts_ready")
 	path_visualizer.clear_points()
 
-func all_ready() -> void:
-	TileManager = ScriptManager.get_script_node("TileManager")
-	GameManager = ScriptManager.get_script_node("GameManager")
-	command_map = ScriptManager.get_script_node("command_map")
-	player = ScriptManager.get_script_node("player")
-	
+func on_scripts_ready() -> void:
 	current_chunk = player.get_player_tile() / TileManager.CHUNK_SIZE
 
-	command_map.map_button_pressed.connect(handle_map_button_press)
-	GameManager.movement_path_updated.connect(on_movement_path_updated)
 	update_map_button_visibility()
 	update_map_chunk_display()
 #endregion

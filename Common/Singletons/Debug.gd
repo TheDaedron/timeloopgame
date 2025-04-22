@@ -1,7 +1,7 @@
 extends Node
 
 @export var debug_mode: bool = true
-@export var debug_threshold: int = 0
+@export var debug_threshold: int = 1
 
 enum LogLevel { TRACE, INFO, WARNING, ERROR }
 var color: String

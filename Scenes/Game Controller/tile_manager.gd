@@ -2,8 +2,8 @@
 extends Node
 
 # Constants
-const LIGHT_RADIUS: int = 3
-const MAX_LIGHT_DISTANCE: int = 8
+const LIGHT_RADIUS: int = 2
+const MAX_LIGHT_DISTANCE: int = 4
 const TILE_SIZE: Vector2i = Vector2i(32, 32)
 const CHUNK_SIZE: Vector2i = Vector2i(24, 18)
 const NUM_CHUNKS: Vector2i = Vector2i(4, 4)
@@ -20,10 +20,6 @@ var chunk_center: Vector2i
 var world_size: Vector2i
 var tile_data_grid: Array = []
 
-# Dependencies
-var tilemap: Node
-var gameManager: Node
-
 #region Initialization
 func _ready() -> void:
 	world_size = CHUNK_SIZE * NUM_CHUNKS
@@ -31,13 +27,10 @@ func _ready() -> void:
 	
 	ScriptManager.set_script_node("TileManager", self)
 
-func all_ready() -> void:
-	tilemap = ScriptManager.get_script_node("tilemap")
-	gameManager = ScriptManager.get_script_node("GameManager")
-	
 	generate_random_map_json(world_size, "user://random_test_map.json")
 	tile_data_grid = load_from_json("user://random_test_map.json")
 #endregion
+
 
 #region Tile Data Access
 func get_tile_data(pos: Vector2i) -> TileProperties:
@@ -51,12 +44,18 @@ func is_in_bounds(pos: Vector2i) -> bool:
 #endregion
 
 #region Darkness & Lighting
+
+# Updates all tiles' darkness based on the player's position
 func update_tile_darkness(player_tile: Vector2i) -> void:
 	for y in tile_data_grid.size():
 		for x in tile_data_grid[y].size():
 			var tile = tile_data_grid[y][x]
-			tile.tile_darkness = calculate_darkness(Vector2i(x, y), player_tile)
+			var tile_pos = Vector2i(x, y)
+			var darkness = calculate_darkness(tile_pos, player_tile)
+			tile.tile_darkness = darkness
+	SignalManager.emit_global("tile_properties_changed")
 
+# Calculates darkness as an integer percentage based on distance from player
 func calculate_darkness(tile_pos: Vector2i, player_pos: Vector2i) -> int:
 	var distance = tile_pos.distance_to(player_pos)
 
@@ -65,8 +64,10 @@ func calculate_darkness(tile_pos: Vector2i, player_pos: Vector2i) -> int:
 	elif distance >= MAX_LIGHT_DISTANCE:
 		return 100
 	else:
-		return int((distance - LIGHT_RADIUS) / (MAX_LIGHT_DISTANCE - LIGHT_RADIUS) * 100)
+		var scaled = int((distance - LIGHT_RADIUS) / (MAX_LIGHT_DISTANCE - LIGHT_RADIUS) * 100)
+		return scaled
 #endregion
+
 
 #region Chunk Utilities
 func get_chunk_offset(chunk: Vector2i) -> Vector2i:
@@ -96,7 +97,7 @@ func generate_random_map_json(size: Vector2i, path: String) -> void:
 			var tile_data = {
 				"x": x,
 				"y": y,
-				"is_walkable": true if randomNumber > 10 else false,
+				"is_walkable": false if randomNumber > 90 else true,
 				"level": randomNumber
 			}
 			tile_list.append(tile_data)

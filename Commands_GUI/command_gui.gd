@@ -6,10 +6,10 @@ var command_tree
 
 func _ready() -> void:
 	ScriptManager.set_script_node("command_gui", self)
+	command_tree = ScriptManager.get_script_node("command_tree", self)
+	SignalManager.connect_global("scripts_ready", self, "on_scripts_ready")
 
-func all_ready() -> void:
-	command_tree = ScriptManager.get_script_node("command_tree")
-	
+func on_scripts_ready() -> void:
 	# Create a nine-slice background from a sprite sheet
 	var button_slice_bg = create_nine_slice_background(button_sprite_sheet)
 
